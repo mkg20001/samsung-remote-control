@@ -1,0 +1,22 @@
+name: samsung-remote-control
+version: 0.0.1
+summary: Another Samsung Remote Control App
+description: Another Samsung Remote Control App
+confinement: devmode  # use "strict" to enforce system access only via declared interfaces
+
+apps:
+  samsung-remote-control:
+    command: bin/desktop-launch $SNAP/samsung-remote-control
+    plugs:
+      - network
+      - network-bind
+      - unity7
+      - opengl
+      - x11
+
+parts:
+    main:
+      source: .
+      plugin: make
+      after:
+        - desktop/gtk2

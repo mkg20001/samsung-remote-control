@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-packager . samsung-remote-control --platform=linux --arch=x64"
   },
   "keywords": [
     "samsung",
