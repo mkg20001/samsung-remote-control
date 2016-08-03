@@ -58,10 +58,10 @@
       <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">Samsung Remote</span>
         <nav class="mdl-navigation">
-          <a class="mdl-navigation__link" href="">Link</a>
-          <a class="mdl-navigation__link" href="">Link</a>
-          <a class="mdl-navigation__link" href="">Link</a>
-          <a class="mdl-navigation__link" href="">Link</a>
+          <a class="mdl-navigation__link">Mobile URL: http://0.0.0.0:6789</a>
+          <a class="mdl-navigation__link" href="javascript:snackbarContainer.MaterialSnackbar.showSnackbar({message:'Another Samsung Remote Control App'});">About this App</a>
+          <a class="mdl-navigation__link" target="_BLANK" href="https://mkg20001.github.io">Author's Page</a>
+          <a class="mdl-navigation__link" target="_BLANK" href="https://github.com/mkg20001">More</a>
         </nav>
       </div>
       <main class="mdl-layout__content">
@@ -100,6 +100,17 @@
         <center id="control" style="display:none;width:100%;">
           <div class="spacer" style="height:25px;"></div>
           <div id="controlbox">
+            <div class="margin">
+              <button onclick="key('tools');" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="material-icons">more_vert</i>
+              </button>
+              <button onclick="key('source');" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="material-icons">settings_input_hdmi</i>
+              </button>
+              <button onclick="key('poweroff');" style="background:red;" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="material-icons">power_settings_new</i>
+              </button>
+            </div>
             <div style="width:240px;height:240px;border-radius:240px;background:grey;">
               <div>
                 <button onclick="key('enter');" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="background:lightgray;z-index:250;width:120px;height:120px;margin:60px;">
@@ -137,6 +148,51 @@
               <button onclick="key('exit');" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                 <i class="material-icons">subdirectory_arrow_left</i>
               </button>
+            </div>
+            <div style="width:240px;height:240px;border-radius:240px;background:grey;">
+              <div>
+                <button onclick="key('ch_list');" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="background:lightgray;z-index:250;width:120px;height:120px;margin:60px;">
+                  <i class="material-icons">tv</i>
+                </button>
+              </div>
+              <div style="margin-top:-240px;">
+                <button onclick="key('chup');" class="noshadow mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="background:grey;width:120px;height:120px;margin:60px;margin-top:0;">
+                  <i class="material-icons" style="margin-top:-32px;">keyboard_arrow_up</i>
+                </button>
+              </div>
+              <div style="margin-top:-180px;">
+                <button onclick="key('chdown');" class="noshadow mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="background:grey;width:120px;height:120px;margin:60px;margin-top:120px;margin-bottom:0;">
+                  <i class="material-icons" style="margin-top:32px;">keyboard_arrow_down</i>
+                </button>
+              </div>
+              <div style="margin-top:-240px;">
+                <button onclick="key('voldown');" class="noshadow mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="background:grey;width:120px;height:120px;margin:60px;margin-right:120px;margin-left:0;">
+                  <i class="material-icons" style="margin-left:-32px;">keyboard_arrow_left</i>
+                </button>
+              </div>
+              <div style="margin-top:-240px;">
+                <button onclick="key('volup');" class="noshadow mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="background:grey;width:120px;height:120px;margin:60px;margin-left:120px;margin-right:0;">
+                  <i class="material-icons" style="margin-left:32px;">keyboard_arrow_right</i>
+                </button>
+              </div>
+            </div>
+            <div class="margin">
+              <button onclick="key('1');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">1</button>
+              <button onclick="key('2');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">2</button>
+              <button onclick="key('3');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">3</button>
+              <br>
+              <button onclick="key('4');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">4</button>
+              <button onclick="key('5');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">5</button>
+              <button onclick="key('6');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">6</button>
+              <br>
+              <button onclick="key('7');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">7</button>
+              <button onclick="key('8');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">8</button>
+              <button onclick="key('9');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">9</button>
+              <br>
+              <button onclick="key('hdmi');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">HDMI</button>
+              <button onclick="key('0');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">0</button>
+              <button onclick="key('ttx_mix');" style="background:lightgray;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">TTX</button>
+              <br>
             </div>
             <div class="margin">
               <button onclick="key('red');" style="background:red;color:white;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">A</button>
@@ -194,6 +250,14 @@
           console.log('user disconnected');
         });
       });
+
+      var oerror=console.error.bind("console");
+      console.error=function() {
+        oerror.apply(console,arguments);
+        var a=[].slice.call(arguments,0);
+        a.unshift("console.error");
+        io.emit.apply(io,a);
+      }
 
       function subnetPing(subnet,cb) {
         hosts=[];
@@ -263,30 +327,34 @@
 
       function init() {
         views("control","connect");
-        state("Looking for a TV...");
-        lookFor([].concat([conf.get("last")],conf.get("common"),arpPing()),function(l) {
+        state("Connecting to TV...");
+        lookFor([conf.get("last")].concat(conf.get("common")),function(l) {
           if (l.length) return found(l);
-          state("Performing subnet network scan (~5min)...");
-          var s=getSubnets();
-          if (s.indexOf("192.168.178")==-1) s.push("192.168.178")
-          if (s.indexOf("192.168.0")==-1) s.push("192.168.0");
-          s=s.reverse();
-          function subping() {
-            var net=s.pop();
-            if (!net) {
-              state("No TV found!");
-              return;
-            }
-            state("Performing "+net+".* network scan (~5min)...");
-            subnetPing(net,function(ls) {
-              if (!ls.length) return subping();
-              lookFor(ls,function(lf) {
-                if (!lf.length) return subping();
-                found(lf);
+          state("Looking for a TV...");
+          lookFor(arpPing(),function(l) {
+            if (l.length) return found(l);
+            state("Performing subnet network scan (~5min)...");
+            var s=getSubnets();
+            if (s.indexOf("192.168.178")==-1) s.push("192.168.178")
+            if (s.indexOf("192.168.0")==-1) s.push("192.168.0");
+            s=s.reverse();
+            function subping() {
+              var net=s.pop();
+              if (!net) {
+                state("No TV found!");
+                return;
+              }
+              state("Performing "+net+".* network scan (~5min)...");
+              subnetPing(net,function(ls) {
+                if (!ls.length) return subping();
+                lookFor(ls,function(lf) {
+                  if (!lf.length) return subping();
+                  found(lf);
+                });
               });
-            });
-          }
-          subping();
+            }
+            subping();
+          });
         });
       }
 
@@ -301,7 +369,7 @@
           if (!d) return;
           setTimeout(doLook,100);
           if (dev) console.log("TRY",d);
-          var s=new rc({ip:d,timeout:1000});
+          var s=new rc({ip:d,timeout:5000});
           s.send("KEY_TEST",function(e) {
             if (!e) f.push(d);
             c++;
@@ -317,7 +385,13 @@
         if (!online) return console.error("OFFLINE");
         if (!keys.filter(function(k2) {return k2==k?k2:null;})[0]) return console.error("INVALID KEY");
         remote.send(k,function(e) {
-          if (e) console.error(e);
+          if (e) {
+            if (e.toString()=="EHOSTUNREACH") {
+              online=false;
+              io.emit("connect.state",online);
+              return init();
+            }
+          }
         });
       }
       server.listen(6789,function(e) {
@@ -347,6 +421,7 @@
             views("control","connect");
           }
         });
+        socket.on("console.error",console.error);
         socket.on("state",state);
       }
       function key(k) {
