@@ -18,44 +18,47 @@
     .noshadow {
       box-shadow: none !important;
     }
-    
+
     .button {
       background: grey;
       color: white;
     }
-    
+
     #loadbox {
       width: 50%;
       margin: 0 auto;
     }
-    
+
     #controlbox {
       width: 100%;
       margin: 0 auto;
     }
-    
+
     .page-content {
       min-height: 100em;
+      background: #5f5f5f;
+      margin-bottom: -1em;
+      margin-top: -1em;
     }
-    
+
     .margin {
       margin: 6px;
     }
-    
+
     .margin>* {
       margin: 6px;
     }
-    
+
     .demo-card-image.mdl-card {
       background: url('img/remote.jpg') center / cover;
     }
-    
+
     .demo-card-image>.mdl-card__actions {
-      height: 52px;
-      padding: 16px;
+      height: 72px;
+      padding: 21px;
       background: rgba(0, 0, 0, 0.2);
     }
-    
+
     .demo-card-image__filename {
       color: #fff;
       font-size: 14px;
@@ -81,7 +84,7 @@
       </nav>
     </div>
     <main class="mdl-layout__content">
-      <div class="page-content" style="background:#5f5f5f;">
+      <div class="page-content">
         <center>
         </center>
 
@@ -254,7 +257,6 @@
   </div>
   <script>
     var main = typeof require != "undefined";
-    dev = true;
     var snackbarContainer = document.querySelector('#demo-toast-example');
 
     function views(i1, i2) {
@@ -262,12 +264,16 @@
       $("#" + i2).fadeIn("slow");
     }
     if (main) {
+      dev = !!process.env.DEV_TOOLS;
+      if (!dev) console.log = () => {}
+
       const http = require("http");
       const keys = require("./keys.js");
       const cp = require("child_process");
       const ee = require("events").EventEmitter;
       const sys = new ee();
       const os = require("os");
+      const ping = require("ping");
       const net = require("net");
       const rc = require("./sremote.js");
       const Configstore = require('configstore');
@@ -342,6 +348,13 @@
         a.unshift("console.error");
         io.emit.apply(io, a);
       }
+      var oinfo = console.info.bind("console");
+      console.info = function() {
+        oinfo.apply(console, arguments);
+        var a = [].slice.call(arguments, 0);
+        a.unshift("console.info");
+        io.emit.apply(io, a);
+      }
 
       function subnetPing(subnet, cb) {
         hosts = [];
@@ -350,29 +363,30 @@
           ips[i] = subnet + "." + i;
         }
         ip = ips.reverse();
-        c = 0;
+        let c = 0;
 
         function subping() {
-          var i = ip.pop();
-          if (c == 253) return;
-          if (!i) return subping();
+          let i = ip.pop();
+          if (c == 254) return;
+          if (!i && !c) {
+            c++;
+            return subping();
+          } else if (!i) return;
           console.log("PING", i);
-          setTimeout(subping, 100);
-          cp.exec("ping " + i + " -c 1 -t 5", function(e) {
-            console.log(i, e);
-            if (!e) {
+          //setTimeout(subping, 100);
+          process.nextTick(subping)
+          ping.sys.probe(i, function(alive) {
+            if (alive) {
               hosts.push(i);
               console.info(i, "is running");
+            } else {
+              console.log("LEFT " + (254 - c))
             }
-            c++;
-            if (c == 253) return cb(hosts);
+            c++
+            if (c == 254) return cb(hosts);
           });
         }
         subping();
-      }
-
-      function arpPing() {
-        return cp.execSync('arp -n | grep "^[0-9]*.[0-9]*.[0-9]*.[0-9]*[0-9]" -o').toString().split("\n");
       }
 
       function getSubnets() {
@@ -404,6 +418,7 @@
         remote = new rc({
           ip: ip
         });
+        $("#connection-state").html("Remote: Connected")
         views("connect", "control");
       }
 
@@ -422,32 +437,29 @@
         state("Connecting to TV...");
         lookFor([conf.get("last")].concat(conf.get("common")), function(l) {
           if (l.length) return found(l);
-          state("Looking for a TV...");
-          lookFor(arpPing(), function(l) {
-            if (l.length) return found(l);
-            state("Performing subnet network scan (~5min)...");
-            var s = getSubnets();
-            if (s.indexOf("192.168.178") == -1) s.push("192.168.178")
-            if (s.indexOf("192.168.0") == -1) s.push("192.168.0");
-            s = s.reverse();
+          state("Looking for a Samsung TV...");
+          var s = getSubnets();
+          //if (s.indexOf("192.168.178") == -1) s.push("192.168.178")
+          //if (s.indexOf("192.168.0") == -1) s.push("192.168.0");
+          s = s.reverse();
 
-            function subping() {
-              var net = s.pop();
-              if (!net) {
-                state("No TV found!");
-                return;
-              }
-              state("Performing " + net + ".* network scan (~5min)...");
-              subnetPing(net, function(ls) {
-                if (!ls.length) return subping();
-                lookFor(ls, function(lf) {
-                  if (!lf.length) return subping();
-                  found(lf);
-                });
-              });
+          function subping() {
+            var net = s.pop();
+            if (!net) {
+              state("No TV found! (Rescanning in 10s)<br>Please turn it on and connect it to wifi");
+              setTimeout(init, 10000)
+              return;
             }
-            subping();
-          });
+            state("Scanning the network " + net + ".1/255...");
+            subnetPing(net, function(ls) {
+              if (!ls.length) return subping();
+              lookFor(ls, function(lf) {
+                if (!lf.length) return subping();
+                found(lf);
+              });
+            });
+          }
+          subping();
         });
       }
 
@@ -461,8 +473,8 @@
         function doLook() {
           var d = list.pop();
           if (!d) return;
-          setTimeout(doLook, 100);
-          if (dev) console.log("TRY", d);
+          process.nextTick(doLook)
+          console.log("TRY", d);
           var s = new rc({
             ip: d,
             timeout: 5000
@@ -477,12 +489,14 @@
       }
 
       function key(k2) {
+        if (!k) return;
         var k = "KEY_" + k2.toUpperCase();
-        console.log("send", k)
         if (!online) return console.error("OFFLINE");
         if (!keys.filter(function(k2) {
             return k2 == k ? k2 : null;
           })[0]) return console.error("INVALID KEY");
+        console.info("Key was pressed: "+k2.toUpperCase())
+
         remote.send(k, function(e) {
           if (e) {
             if (e.toString() == "EHOSTUNREACH") {
@@ -507,9 +521,15 @@
           });
         }
       });
+      $("#connection-state").html("Remote: Disconnected")
     } else {
+      var firstNew = false;
+
       function state(v) {
-        console.info(v);
+        if (firstNew) {
+          console.info(v)
+          firstNew = false
+        }
         $("#state").html(v);
       }
 
@@ -518,6 +538,7 @@
       function init() {
         socket = io();
         socket.on("connect", function() {
+          firstNew = true;
           if (!snackbarContainer.MaterialSnackbar) return;
           snackbarContainer.MaterialSnackbar.showSnackbar({
             message: "Connected"
@@ -536,8 +557,6 @@
               message: "Connection lost. Reconnecting..."
             });
           }
-
-
         });
         socket.on("connect.state", function(online) {
           if (online) {
@@ -549,12 +568,14 @@
           }
         });
         socket.on("console.error", console.error);
+        socket.on("console.info", console.info);
         socket.on("state", state);
       }
 
       $("#mobile-url").html("Mobile URL: " + window.location.href);
 
       function key(k) {
+        if (!k) return;
         socket.emit("key", k);
       }
     }
