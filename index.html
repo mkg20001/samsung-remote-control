@@ -11,7 +11,6 @@
   <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-  <!-- this is weird - but a workaround -->
   <script src="/socket.io/socket.io.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -76,10 +75,9 @@
     <div class="mdl-layout__drawer">
       <span class="mdl-layout-title">Samsung Remote</span>
       <nav class="mdl-navigation">
-        <a class="mdl-navigation__link">Mobile URL: http://0.0.0.0:6789</a>
-        <a class="mdl-navigation__link" href="javascript:snackbarContainer.MaterialSnackbar.showSnackbar({message:'Another Samsung Remote Control App'});">About this App</a>
-        <a class="mdl-navigation__link" target="_BLANK" href="https://mkg20001.github.io">Author's Page</a>
-        <a class="mdl-navigation__link" target="_BLANK" href="https://github.com/mkg20001">More</a>
+        <a class="mdl-navigation__link" id="mobile-url">Loading...</a>
+        <a class="mdl-navigation__link" id="connection-state">Loading...</a>
+        <a class="mdl-navigation__link" href="javascript:snackbarContainer.MaterialSnackbar.showSnackbar({message:'Another Samsung Remote Control App by mkg20001'});">About</a>
       </nav>
     </div>
     <main class="mdl-layout__content">
@@ -279,6 +277,45 @@
         common: []
       });
 
+      function getLocalIP() {
+        var ifaces = os.networkInterfaces();
+        var list = []
+
+        Object.keys(ifaces).forEach(function(ifname) {
+          var alias = 0;
+
+          ifaces[ifname].forEach(function(iface) {
+            if ('IPv4' !== iface.family || iface.internal !== false) {
+              // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+              return;
+            }
+
+            if (alias >= 1) {
+              // this single interface has multiple ipv4 addresses
+              //console.log(ifname + ':' + alias, iface.address); TODO: deal with that
+            } else {
+              // this interface has only one ipv4 adress
+              list.push({
+                name: ifname,
+                address: iface.address
+              })
+            }
+            ++alias;
+          });
+        });
+        var list2 = list.filter((o_) => {
+          var o = o_.name;
+          if (o.startsWith("eth") || o.startsWith("enp") || o.startsWith("wlan")) return true;
+        })
+        if (!list.length) {
+          snackbarContainer.MaterialSnackbar.showSnackbar({
+            message: "Failed to get network interfaces!"
+          });
+          return "0.0.0.0"
+        }
+        return list2.length ? list2.shift().address : list.shift().address;
+      }
+
       const app = require("express")();
       app.get('/', function(req, res) {
         res.sendFile(__dirname + '/index.html');
@@ -460,9 +497,14 @@
         if (!e) {
           setTimeout(function() {
             snackbarContainer.MaterialSnackbar.showSnackbar({
-              message: "Use this app on your mobile - http://0.0.0.0:" + 6789
+              message: "Use this app on your mobile - http://" + getLocalIP() + ":" + 6789
             });
           }, 1000);
+          $("#mobile-url").html("Mobile URL: http://" + getLocalIP() + ":" + 6789)
+        } else {
+          snackbarContainer.MaterialSnackbar.showSnackbar({
+            message: "Failed to start the server! Already running?"
+          });
         }
       });
     } else {
@@ -476,20 +518,41 @@
       function init() {
         socket = io();
         socket.on("connect", function() {
+          if (!snackbarContainer.MaterialSnackbar) return;
           snackbarContainer.MaterialSnackbar.showSnackbar({
             message: "Connected"
           });
         });
+        socket.on("reconnecting", function(i) {
+          if (!snackbarContainer.MaterialSnackbar) return;
+          if (i - 1) {
+            $("#connection-state").html("Still Reconnecting...")
+            snackbarContainer.MaterialSnackbar.showSnackbar({
+              message: "Connection lost. Still reconnecting..."
+            });
+          } else {
+            $("#connection-state").html("Reconnecting...")
+            snackbarContainer.MaterialSnackbar.showSnackbar({
+              message: "Connection lost. Reconnecting..."
+            });
+          }
+
+
+        });
         socket.on("connect.state", function(online) {
           if (online) {
+            $("#connection-state").html("Remote: Connected")
             views("connect", "control");
           } else {
+            $("#connection-state").html("Remote: Disconnected")
             views("control", "connect");
           }
         });
         socket.on("console.error", console.error);
         socket.on("state", state);
       }
+
+      $("#mobile-url").html("Mobile URL: " + window.location.href);
 
       function key(k) {
         socket.emit("key", k);
