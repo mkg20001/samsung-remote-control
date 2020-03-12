@@ -16,7 +16,7 @@
   "author": "Maciej Krüger",
   "license": "GPL-3.0",
   "dependencies": {
-    "configstore": "^2.1.0",
+    "configstore": "^3.1.0",
     "express": "^4.14.0",
     "ping": "^0.2.1",
     "samsung-remote": "^1.2.5",
